@@ -6,22 +6,27 @@ using System.Dynamic;
 using System.Linq;
 using System.Net;
 using RestSharp;
+using System.Diagnostics;
 
 namespace Reactive
 {
+    using Reactive.Extensions;
+
     public class Binder : DynamicObject
     {
         protected Command _fetch;
         protected Command _destroy;
         protected Command _display;
 
-        public ICommand Fetch   { get { return _fetch; } }
+        public ICommand Fetch { get { return _fetch; } }
         public ICommand Destroy { get { return _destroy; } }
         public ICommand Display { get { return _display; } }
 
+        public IResourceInfo Resource { get; set; }
+
         public Binder()
         {
-            _fetch   = new FetchCommand(this);
+            _fetch = new FetchCommand(this);
             _destroy = new DestroyCommand(this);
             _display = new DisplayCommand(this);
         }
@@ -31,7 +36,7 @@ namespace Reactive
 
             var name = binder.Name;
             result = "Some text";
- 
+
             return true;
         }
     }
@@ -41,21 +46,20 @@ namespace Reactive
         protected Command _create;
         protected Command _update;
 
-        public ICommand Create  { get { return _create; } }
-        public ICommand Update  { get { return _update; } }
+        public ICommand Create { get { return _create; } }
+        public ICommand Update { get { return _update; } }
 
         public FormBinder()
         {
-            _create  = new CreateCommand(this);
-            _update  = new UpdateCommand(this);
+            _create = new CreateCommand(this);
+            _update = new UpdateCommand(this);
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-
             var name = binder.Name;
             result = "Some text";
- 
+
             return true;
         }
     }
@@ -82,18 +86,9 @@ namespace Reactive
 
         public void Execute(object parameter)
         {
-            // explode parameter and run the request, subclasses customizing the request
-            var source = (DependencyObject)parameter;
-            if (source == null)
-            {
-                NotifyError(new Exception("Invalid arguments")); // TODO: declare explicit exception class 
-                return;
-            }
+            var resource = parameter as IResourceInfo;
 
-            string uri = BinderParameters.GetResourceUri(source);
-            openMode = BinderParameters.GetOpenMode(source);
-
-            RunRequest(uri);
+            RunRequest(resource.Uri);
         }
 
         public bool CanExecute(object parameter)
@@ -106,7 +101,7 @@ namespace Reactive
         protected abstract void FillRequest(IRestRequest request);
         protected abstract void HandleResponse(IRestResponse response);
 
-        public void RunRequest(string uri)
+        public void RunRequest(String uri)
         {
             var request = new RestRequest(uri);
             FillRequest(request);
@@ -157,7 +152,8 @@ namespace Reactive
     {
         protected new FormBinder binder;
 
-        public FormCommand(FormBinder binder) : base(binder)
+        public FormCommand(FormBinder binder)
+            : base(binder)
         {
             this.binder = binder;
         }
@@ -175,18 +171,18 @@ namespace Reactive
         protected override void HandleResponse(IRestResponse response)
         {
             // We have three kind of responses,
+            // 1. Ok created, or updated. Do nothing
+            // 2. We receive back a data object indicating form errors (validation)
+            // 3. Redirected, which means a Display command
             switch (response.StatusCode)
             {
-                // 1. Ok created, or updated. Do nothing
                 case HttpStatusCode.Created:
                 case HttpStatusCode.NoContent:
                     break;
 
-                // 2. We receive back a data object indicating form errors (validation)
                 case HttpStatusCode.OK:
                     break;
 
-                // 3. Redirected, which means a Display command
                 case HttpStatusCode.Found:
                 case HttpStatusCode.Moved:
                 // We should only have to handle SeeOther but in some circomstances servers may respond with 301 or 302.
@@ -202,7 +198,7 @@ namespace Reactive
         }
     }
 
-    public class CreateCommand :FormCommand
+    public class CreateCommand : FormCommand
     {
         public CreateCommand(FormBinder binder) : base(binder) { }
         public CreateCommand(Command source) : base(source) { }
@@ -312,22 +308,7 @@ namespace Reactive
         {
             return (string)element.GetValue(OpenModeProperty);
         }
+
     }
 
-    // Extension to shorten the CommandParamter content to CommandParamter="{reactive:Self}"
-    // instead of CommandParamter="{Binding RelativeSource={RelativeSource Self}}"
-    // To enable add this namespace to the XAML document: xmlns:reactive="clr-namespace:Reactive"
-    public class SelfExtension : MarkupExtension
-    {
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
-            var obj = serviceProvider.GetService(typeof(IProvideValueTarget)) as IProvideValueTarget;
-            if (obj == null)
-            {
-                throw new ArgumentNullException("IServiceProvider did not give the required IProvideValueTarget object");
-            }
-
-            return obj.TargetObject;
-        }
-    }
 }
