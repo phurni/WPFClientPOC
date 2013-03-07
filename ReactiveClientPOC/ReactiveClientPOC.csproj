@@ -59,6 +59,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Reactive\Binder.cs" />
+    <Compile Include="Reactive\Command.cs" />
     <Compile Include="Reactive\Extensions.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
