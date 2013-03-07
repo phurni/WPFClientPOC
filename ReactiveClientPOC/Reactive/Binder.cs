@@ -10,8 +10,6 @@ using System.Diagnostics;
 
 namespace Reactive
 {
-    using Reactive.Extensions;
-
     public class Binder : DynamicObject
     {
         protected Command _fetch;
@@ -21,8 +19,6 @@ namespace Reactive
         public ICommand Fetch { get { return _fetch; } }
         public ICommand Destroy { get { return _destroy; } }
         public ICommand Display { get { return _display; } }
-
-        public IResourceInfo Resource { get; set; }
 
         public Binder()
         {
@@ -49,10 +45,12 @@ namespace Reactive
         public ICommand Create { get { return _create; } }
         public ICommand Update { get { return _update; } }
 
-        public FormBinder()
+        public FormBinder(string uri)
         {
             _create = new CreateCommand(this);
             _update = new UpdateCommand(this);
+
+            new FetchCommand(this).Execute(new CommandArguments() { Uri = uri });
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)

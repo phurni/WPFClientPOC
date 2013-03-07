@@ -16,9 +16,7 @@ namespace ReactiveClientPOC
             Properties.Add("restClient", CreateRestClient(ReactiveClientPOC.Properties.Settings.Default.BaseURL));
 
             // Fetch and display the root window
-            //var parameter = new DependencyObject();
-            //BinderParameters.SetResourceUri(parameter, "/");
-            //(new Binder()).Display.Execute(parameter);
+            //new Binder().Fetch.Execute(new CommandArguments() { Uri = "/" });
             new MainWindow().Show();
         }
 

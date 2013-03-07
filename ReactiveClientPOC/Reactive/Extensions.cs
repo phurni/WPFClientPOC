@@ -6,61 +6,51 @@ using System.Windows.Markup;
 using System.Xaml;
 using Reactive;
 
-namespace Reactive.Extensions
+namespace Reactive
 {
-    public static class ServiceProviderExtensions
-    {
-        public static T GetService<T>(this IServiceProvider self)
-            where T : class
-        {
-            return self.GetService(typeof(T)) as T;
-        }
-    }
-
-    // Enregistement: xmlns:r="clr-namespace:Reactive.Extensions"
-    public class SelfExtension : MarkupExtension
-    {
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
-            var obj = serviceProvider.GetService<IProvideValueTarget>();
-            if (obj == null)
-            {
-                throw new ArgumentNullException("ISetviceProvider did not give the required IProvideValueTarget object");
-            }
-
-            return obj.TargetObject;
-        }
-    }
-
-    public interface IResourceInfo
+    public interface ICommandArguments
     {
         string Uri { get; set; }
         string OpenMode { get; set; }
     }
 
-    public class ResourceExtension : MarkupExtension, IResourceInfo
+    public class CommandArguments : ICommandArguments
     {
         public string Uri { get; set; }
         public string OpenMode { get; set; }
-
-        public ResourceExtension(string uri)
-        {
-            this.Uri = uri;
-        }
-
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
-            return this as IResourceInfo;
-        }
     }
 
-    public class FormBinderExtension : MarkupExtension
+    public class CommandExtension : MarkupExtension, ICommandArguments
     {
-        public IResourceInfo Target { get; set; }
+        protected CommandArguments args = new CommandArguments();
+
+        public string Uri      { get { return args.Uri;      } set { args.Uri      = value; } }
+        public string OpenMode { get { return args.OpenMode; } set { args.OpenMode = value; } }
+
+        public CommandExtension(string uri)
+        {
+            args.Uri = uri;
+        }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            return new FormBinder() { Resource = Target };
+            return args;
         }
     }
+
+    public class FormExtension : MarkupExtension
+    {
+        protected string uri;
+
+        public FormExtension(string uri)
+        {
+            this.uri = uri;
+        }
+
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return new FormBinder(uri);
+        }
+    }
+
 }

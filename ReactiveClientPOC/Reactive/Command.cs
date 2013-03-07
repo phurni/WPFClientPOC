@@ -1,5 +1,4 @@
-﻿using Reactive.Extensions;
-using RestSharp;
+﻿using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +14,7 @@ namespace Reactive
     {
         protected Binder binder;
         protected RestClient rest;
-
-        protected string openMode;
+        protected ICommandArguments args;
 
         public Command(Binder binder)
         {
@@ -28,14 +26,19 @@ namespace Reactive
         {
             binder = source.binder;
             rest = source.rest;
-            openMode = source.openMode;
+            args = source.args;
         }
 
         public void Execute(object parameter)
         {
-            var resource = parameter as IResourceInfo;
+            args = parameter as ICommandArguments;
+            if (args == null)
+            {
+                NotifyError(new Exception("Invalid arguments")); // TODO: declare explicit exception class 
+                return;
+            }
 
-            RunRequest(resource.Uri);
+            RunRequest(args.Uri);
         }
 
         public bool CanExecute(object parameter)
@@ -48,7 +51,7 @@ namespace Reactive
         protected abstract void FillRequest(IRestRequest request);
         protected abstract void HandleResponse(IRestResponse response);
 
-        public void RunRequest(String uri)
+        protected void RunRequest(String uri)
         {
             var request = new RestRequest(uri);
             FillRequest(request);
@@ -135,7 +138,8 @@ namespace Reactive
                 // We should only have to handle SeeOther but in some circomstances servers may respond with 301 or 302.
                 case HttpStatusCode.SeeOther:
                     var displayCommand = new DisplayCommand(this);
-                    displayCommand.RunRequest((string)response.Headers.Where(header => header.Name == "Location").First().Value);
+                    new DisplayCommand(this).Execute(new CommandArguments() { Uri = (string)response.Headers.Where(header => header.Name == "Location").First().Value });
+
                     break;
 
                 default:
@@ -213,7 +217,7 @@ namespace Reactive
 
         protected override void HandleResponse(IRestResponse response)
         {
-            switch (openMode)
+            switch (args.OpenMode)
             {
                 case "newPane":
                     break;
