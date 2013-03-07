@@ -63,37 +63,4 @@ namespace Reactive
             return true;
         }
     }
-
-    public static class BinderParameters
-    {
-        private static readonly DependencyProperty ResourceUriProperty =
-            DependencyProperty.RegisterAttached("ResourceUri",
-                                                typeof(string),
-                                                typeof(BinderParameters));
-
-        private static readonly DependencyProperty OpenModeProperty =
-            DependencyProperty.RegisterAttached("OpenMode",
-                                                typeof(string),
-                                                typeof(BinderParameters));
-
-        public static void SetResourceUri(DependencyObject element, string value)
-        {
-            element.SetValue(ResourceUriProperty, value);
-        }
-        public static string GetResourceUri(DependencyObject element)
-        {
-            return (string)element.GetValue(ResourceUriProperty);
-        }
-
-        public static void SetOpenMode(DependencyObject element, string value)
-        {
-            element.SetValue(OpenModeProperty, value);
-        }
-        public static string GetOpenMode(DependencyObject element)
-        {
-            return (string)element.GetValue(OpenModeProperty);
-        }
-
-    }
-
 }

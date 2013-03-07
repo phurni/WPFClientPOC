@@ -34,12 +34,11 @@
                     <TextBox Grid.Column="1" Height="30" HorizontalAlignment="Left" Margin="68,6,0,0" Name="title" VerticalAlignment="Top" Width="147" Text="{Binding title}" />
                     <TextBox Grid.Column="1" Height="32" HorizontalAlignment="Left" Margin="69,42,0,0" Name="artist" VerticalAlignment="Top" Width="146" Text="{Binding artist}" />
                     <Button Command="{Binding Create}" Content="Add" Grid.Column="2" Height="32" HorizontalAlignment="Left" Margin="58,42,0,0" Name="button2" Tag="another stuff" VerticalAlignment="Top" Width="93"
-                            CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
-                            reactive:BinderParameters.ResourceUri="/songs" 
+                            CommandParameter="{r:Resource /songs}"
                      />
                 </Grid>
             </GroupBox>
-            <Button Content="List users" Height="27" HorizontalAlignment="Left" Margin="10,133,0,0" Name="button3" VerticalAlignment="Top" Width="98" Command="{Binding Display}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" reactive:BinderParameters.OpenMode="newWindow" reactive:BinderParameters.ResourceUri="/users" />
+            <Button Content="List users" Height="27" HorizontalAlignment="Left" Margin="10,133,0,0" Name="button3" VerticalAlignment="Top" Width="98" Command="{Binding Display}" CommandParameter="{r:Resource /songs, OpenMode=newWindow}" />
         </Grid>
     </Grid>
 </Window>
