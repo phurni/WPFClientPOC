@@ -50,6 +50,7 @@ namespace Reactive
             _create = new CreateCommand(this);
             _update = new UpdateCommand(this);
 
+            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject())) return;
             new FetchCommand(this).Execute(new CommandArguments() { Uri = uri });
         }
 
