@@ -21,6 +21,7 @@ namespace Reactive
         public ICommand Display { get { return _display; } }
 
         public dynamic Data { get; set; }
+        internal dynamic Context { get; private set; }
 
         public Binder()
         {
@@ -28,6 +29,7 @@ namespace Reactive
             _destroy = new DestroyCommand(this);
             _display = new DisplayCommand(this);
             Data = new ExpandoObject();
+            Context = new ExpandoObject();
         }
     }
 

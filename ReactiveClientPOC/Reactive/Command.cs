@@ -117,10 +117,11 @@ namespace Reactive
 
         protected override void FillRequest(IRestRequest request)
         {
+            string contentType = binder.Context.contentType ?? "application/json;text/json";
             request.AddHeader("Accept", "application/xml;application/json;text/xml;text/json");
 
-            // iterate over the binder properties to add them as parameters
-            //binder.GetDynamicMemberNames().
+            var writer = restWriterProvider.Find(null, contentType);
+            request.AddParameter(writer.ContentType.First(), writer.Write(binder.Data), ParameterType.RequestBody);
         }
 
         protected override void HandleResponse(IRestResponse response)
@@ -196,6 +197,7 @@ namespace Reactive
         {
             var reader = restReaderProvider.Find(response.ContentType);
             binder.Data = reader.Read(response.Content);
+            binder.Context.contentType = response.ContentType;
         }
     }
 
