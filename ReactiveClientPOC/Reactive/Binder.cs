@@ -20,11 +20,14 @@ namespace Reactive
         public ICommand Destroy { get { return _destroy; } }
         public ICommand Display { get { return _display; } }
 
+        public dynamic Data { get; set; }
+
         public Binder()
         {
             _fetch = new FetchCommand(this);
             _destroy = new DestroyCommand(this);
             _display = new DisplayCommand(this);
+            Data = new ExpandoObject();
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)

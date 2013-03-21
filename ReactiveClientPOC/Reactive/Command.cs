@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Markup;
+using JsonFx.Serialization.Providers;
 
 namespace Reactive
 {
@@ -14,12 +15,16 @@ namespace Reactive
     {
         protected Binder binder;
         protected RestClient rest;
+        protected IDataReaderProvider restReaderProvider;
+        protected IDataWriterProvider restWriterProvider;
         protected ICommandArguments args;
 
         public Command(Binder binder)
         {
             this.binder = binder;
             rest = (RestClient)Application.Current.Properties["restClient"];
+            restReaderProvider = (IDataReaderProvider)Application.Current.Properties["restReaderProvider"];
+            restWriterProvider = (IDataWriterProvider)Application.Current.Properties["restWriterProvider"];
         }
 
         public Command(Command source)
@@ -175,17 +180,22 @@ namespace Reactive
 
     public class FetchCommand : Command
     {
+        protected string contentType;
+
         public FetchCommand(Binder binder) : base(binder) { }
         public FetchCommand(Command source) : base(source) { }
 
         protected override void FillRequest(IRestRequest request)
         {
+            contentType = "application/xml;application/json;text/xml;text/json";
             request.Method = Method.GET;
-            request.AddHeader("Accept", "application/xml;application/json;text/xml;text/json");
+            request.AddHeader("Accept", contentType);
         }
 
         protected override void HandleResponse(IRestResponse response)
         {
+            var reader = restReaderProvider.Find(response.ContentType);
+            binder.Data = reader.Read(response.Content);
         }
     }
 

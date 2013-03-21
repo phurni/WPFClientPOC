@@ -15,8 +15,8 @@
                     <ColumnDefinition Width="236*" />
                     <ColumnDefinition Width="157*" />
                 </Grid.ColumnDefinitions>
-                <TextBox Height="30" HorizontalAlignment="Left" Margin="68,6,0,0" Name="firstname" Text="{Binding FirstName}" VerticalAlignment="Top" Width="147" Grid.Column="1" />
-                <TextBox Height="32" HorizontalAlignment="Left" Margin="69,42,0,0" Name="lastname" Text="{Binding LastName}" VerticalAlignment="Top" Width="146" Grid.Column="1" />
+                <TextBox Height="30" HorizontalAlignment="Left" Margin="68,6,0,0" Name="firstname" Text="{Binding Data.FirstName}" VerticalAlignment="Top" Width="147" Grid.Column="1" />
+                <TextBox Height="32" HorizontalAlignment="Left" Margin="69,42,0,0" Name="lastname" Text="{Binding Data.LastName}" VerticalAlignment="Top" Width="146" Grid.Column="1" />
                 <Button Content="Add" Height="32" HorizontalAlignment="Left" Margin="58,42,0,0" Name="button1" VerticalAlignment="Top" Width="93" Grid.Column="2" Command="{Binding Create}"
                         CommandParameter="{reactive:Command /users}"
                 />
