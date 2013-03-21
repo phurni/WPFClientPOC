@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Reactive
 {
-    public class Binder : DynamicObject
+    public class Binder
     {
         protected Command _fetch;
         protected Command _destroy;
@@ -29,15 +29,6 @@ namespace Reactive
             _display = new DisplayCommand(this);
             Data = new ExpandoObject();
         }
-
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
-        {
-
-            var name = binder.Name;
-            result = "Some text";
-
-            return true;
-        }
     }
 
     public class FormBinder : Binder
@@ -55,14 +46,6 @@ namespace Reactive
 
             if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject())) return;
             new FetchCommand(this).Execute(new CommandArguments() { Uri = uri });
-        }
-
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
-        {
-            var name = binder.Name;
-            result = "Some text";
-
-            return true;
         }
     }
 }
